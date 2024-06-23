@@ -1,0 +1,8 @@
+[env]
+_.file = '.env'
+
+[tools]
+erlang = "26.2.5"
+elixir = "1.17.0-otp-26"
+nodejs = "20.15.0"
+# python = "3.12.4"
