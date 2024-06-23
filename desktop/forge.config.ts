@@ -32,6 +32,10 @@ const config: ForgeConfig = {
           entry: "src/preload.ts",
           config: "vite.preload.config.ts",
         },
+        {
+          entry: "src/watcher.ts",
+          config: "vite.watcher.config.ts",
+        },
       ],
       renderer: [
         {

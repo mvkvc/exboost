@@ -1,19 +1,22 @@
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  utilityProcess,
-  MessageChannelMain,
-  UtilityProcess,
-  Menu,
-  Tray,
-} from "electron";
 import path from "path";
-import { selectFolders } from "./ipc/files";
+import { fork, ChildProcess } from "child_process";
+import { app, BrowserWindow, ipcMain } from "electron";
+import {
+  getFolders,
+  addFolders,
+  deleteFolders,
+  deleteAllFolders,
+} from "./main/db";
+import { selectFolders } from "./main/files";
+import { umzug } from "./main/schema";
+
+export interface WatcherConfig {
+  folderPaths: string[];
+  ignorePatterns: string[];
+}
 
 let mainWindow: BrowserWindow;
-let tray: Tray | null = null;
-let child: Electron.UtilityProcess | null = null;
+let watcherProcess: ChildProcess | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -28,7 +31,6 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
-    show: false,
   });
 
   // and load the index.html of the app.
@@ -43,12 +45,42 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
+function startWatcher(config: WatcherConfig) {
+  watcherProcess?.kill();
+
+  const watcherPath = path.join(__dirname, "watcher.js");
+  watcherProcess = fork(watcherPath);
+  watcherProcess.send(config);
+
+  watcherProcess.on("message", (message) => {
+    handleWatcherMessage(message);
+  });
+}
+
+function handleWatcherMessage(message: any) {
+  console.log("Message from watcher: ", message);
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 // app.on("ready", createWindow);
-app.whenReady().then(() => {
+app.on("ready", async () => {
   ipcMain.handle("selectFolders", selectFolders);
+  ipcMain.handle("getFolders", getFolders);
+  ipcMain.handle("addFolders", (_event, folderPaths) =>
+    addFolders(folderPaths),
+  );
+  ipcMain.handle("deleteFolders", (_event, folderPaths) =>
+    deleteFolders(folderPaths),
+  );
+  ipcMain.handle("deleteAllFolders", deleteAllFolders);
+  ipcMain.handle("startWatcher", (_event, config: WatcherConfig) =>
+    startWatcher(config),
+  );
+
+  await umzug.up();
+
   createWindow();
 });
 
@@ -56,7 +88,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  child?.kill();
+  watcherProcess?.kill();
 
   if (process.platform !== "darwin") {
     app.quit();

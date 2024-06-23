@@ -2,18 +2,27 @@ import React from "react";
 import useFilesStore from "../stores/files";
 
 export default function Sources() {
-  const folders = useFilesStore((state) => state.folders);
-  const addFolders = useFilesStore((state) => state.addFolders);
-  const removeFolders = useFilesStore((state) => state.removeFolders);
+  const folderPaths = useFilesStore((state) => state.folderPaths);
   const setFolders = useFilesStore((state) => state.setFolders);
+  const addFolders = useFilesStore((state) => state.addFolders);
+  const deleteFolders = useFilesStore((state) => state.deleteFolders);
 
   const handleSelectFolders = async () => {
-    const paths = await window.electronAPI.selectFolders();
-    addFolders(paths);
+    const folderPaths = await window.electronAPI.selectFolders();
+    if (folderPaths && folderPaths.length >= 0) {
+      addFolders(folderPaths);
+      await window.electronAPI.addFolders(folderPaths);
+    }
   };
 
-  const handleDeleteFolders = async () => {
+  const handleDeleteFolders = async (folders: string[]) => {
+    deleteFolders(folders);
+    await window.electronAPI.deleteFolders(folders);
+  };
+
+  const handleDeleteAllFolders = async () => {
     setFolders([]);
+    await window.electronAPI.deleteAllFolders();
   };
 
   return (
@@ -22,12 +31,14 @@ export default function Sources() {
         <h1>Sources</h1>
         <div className="flex flex-row space-x-4">
           <button onClick={handleSelectFolders}>Add Folder</button>
-          <button onClick={handleDeleteFolders}>Delete Folders</button>
+          <button onClick={handleDeleteAllFolders}>Delete All Folders</button>
         </div>
-        {folders.map((folder) => (
-          <div key={folder} className="flex flex-row space-x-4">
-            <p>{folder}</p>
-            <button onClick={() => removeFolders([folder])}>Remove</button>
+        {folderPaths.map((folderPath) => (
+          <div key={folderPath} className="flex flex-row space-x-4">
+            <p>{folderPath}</p>
+            <button onClick={() => handleDeleteFolders([folderPath])}>
+              Remove
+            </button>
           </div>
         ))}
       </div>
