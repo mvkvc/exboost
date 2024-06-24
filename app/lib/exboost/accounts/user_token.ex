@@ -126,6 +126,26 @@ defmodule Exboost.Accounts.UserToken do
     end
   end
 
+  def verify_api_token_query(token) do
+    context = "api-token"
+    case Base.url_decode64(token, padding: false) do
+      {:ok, decoded_token} ->
+        hashed_token = :crypto.hash(@hash_algorithm, decoded_token)
+        days = days_for_context(context)
+
+        query =
+          from token in by_token_and_context_query(hashed_token, context),
+            join: user in assoc(token, :user),
+            where: token.inserted_at > ago(^days, "day") and token.sent_to == user.email,
+            select: user
+
+        {:ok, query}
+
+      :error ->
+        :error
+    end
+  end
+
   defp days_for_context("api-token"), do: 365
   defp days_for_context("confirm"), do: @confirm_validity_in_days
   defp days_for_context("reset_password"), do: @reset_password_validity_in_days

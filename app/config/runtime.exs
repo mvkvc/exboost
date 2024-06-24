@@ -20,6 +20,14 @@ if System.get_env("PHX_SERVER") do
   config :exboost, ExboostWeb.Endpoint, server: true
 end
 
+config :exboost,
+  s3_bucket: System.get_env("S3_BUCKET"),
+  s3_presigned_url_duration: String.to_integer(System.get_env("S3_PRESIGNED_URL_DURATION"))
+
+config :ex_aws,
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

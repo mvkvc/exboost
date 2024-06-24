@@ -9,6 +9,7 @@ import {
 } from "./main/db";
 import { selectFolders } from "./main/files";
 import { umzug } from "./main/schema";
+import { requestPresignedURL } from "./main/api";
 
 export interface WatcherConfig {
   folderPaths: string[];
@@ -17,6 +18,8 @@ export interface WatcherConfig {
 
 let mainWindow: BrowserWindow;
 let watcherProcess: ChildProcess | null = null;
+let URL: string;
+let APIKey: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -59,6 +62,15 @@ function startWatcher(config: WatcherConfig) {
 
 function handleWatcherMessage(message: any) {
   console.log("Message from watcher: ", message);
+  const {type, data } = message;
+  switch (type) {
+    case "add":
+      break;
+    case "change":
+      break;
+    case "unlink":
+      break;
+  }
 }
 
 // This method will be called when Electron has finished

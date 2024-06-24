@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 
-const DEFAULT_IGNORE_PATTERNS = ["*.jpg", "*.jpeg", "*.png", "*.gif"];
+const DEFAULT_IGNORE_PATTERNS = ["node_modules", ".git"];
 
 type State = {
   folderPaths: string[];
@@ -66,7 +66,6 @@ const useFilesStore = create<State & Actions>()(
   ),
 );
 
-// Subscribe to changes in folderPaths or ignorePatterns
 useFilesStore.subscribe(
   (state) => [state.folderPaths, state.ignorePatterns],
   async ([folderPaths, ignorePatterns]) => {

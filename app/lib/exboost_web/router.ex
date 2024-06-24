@@ -24,10 +24,11 @@ defmodule ExboostWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ExboostWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ExboostWeb do
+    pipe_through :api
+
+    post "/presigned", PresignedController, :create
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:exboost, :dev_routes) do

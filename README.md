@@ -7,5 +7,5 @@ Increase your personal RAM.
 ```bash
 .
 ├── app # Main application
-└── desktop # Desktop app to sync folders to app
+└── desktop # Desktop app to sync folders
 ```

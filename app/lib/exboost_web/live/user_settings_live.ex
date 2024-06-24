@@ -11,6 +11,14 @@ defmodule ExboostWeb.UserSettingsLive do
     </.header>
 
     <div class="space-y-12 divide-y">
+      <div class="space-y-2">
+        <h3>API Key</h3>
+        <p><%= @api_key || "Shows when generated" %></p>
+        <button
+          phx-click="generate_api_key"
+          class="btn"
+        >Generate</button>
+      </div>
       <div>
         <.simple_form
           for={@email_form}
@@ -90,6 +98,7 @@ defmodule ExboostWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    api_key = nil
 
     socket =
       socket
@@ -99,6 +108,7 @@ defmodule ExboostWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
+      |> assign(:api_key, api_key)
 
     {:ok, socket}
   end
@@ -163,5 +173,11 @@ defmodule ExboostWeb.UserSettingsLive do
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
     end
+  end
+
+  def handle_event("generate_api_key", _params, socket) do
+    user = socket.assigns.current_user
+    api_key = Accounts.create_user_api_token(user)
+    {:noreply, assign(socket, api_key: api_key)}
   end
 end

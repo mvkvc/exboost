@@ -1,33 +1,31 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { Settings, DEFAULT_SETTINGS } from "../utils/settings";
 
-const DEFAULT_SERVER_URL = "https://exboost.replicantzk.com";
-
-type State = {
-  serverURL: string;
-  serverAPIKey: string;
-};
+type State = Settings;
 
 type Actions = {
-  setServerURL: (serverURL: string) => void;
-  setServerAPIKey: (serverAPIKey: string) => void;
+  getSettings: () => Settings;
+  setSettings: (settings: Partial<Settings>) => void;
 };
 
 const useSettingsStore = create<State & Actions>()(
-  immer((set) => ({
-    serverURL: DEFAULT_SERVER_URL,
-    serverAPIKey: "",
-    setServerURL: (serverURL: string) => {
-      set((state) => {
-        state.serverURL = serverURL;
-      });
-    },
-    setServerAPIKey: (serverAPIKey: string) => {
-      set((state) => {
-        state.serverAPIKey = serverAPIKey;
-      });
-    },
-  })),
+  persist(
+    immer((set, get) => ({
+      ...DEFAULT_SETTINGS,
+      getSettings: () => get(),
+      setSettings: (settings: Partial<Settings>) => {
+        set((state) => {
+          Object.assign(state, settings);
+        });
+      },
+    })),
+    {
+      name: "settings",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
 );
 
 export default useSettingsStore;

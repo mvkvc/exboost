@@ -3,6 +3,8 @@ defmodule Exboost.Accounts do
   The Accounts context.
   """
 
+  # @hash_algorithm :sha256
+
   import Ecto.Query, warn: false
   alias Exboost.Repo
 
@@ -358,11 +360,11 @@ defmodule Exboost.Accounts do
   The token returned must be saved somewhere safe.
   This token cannot be recovered from the database.
   """
-  def create_user_api_token(user) do
-    {encoded_token, user_token} = UserToken.build_email_token(user, "api-token")
-    Repo.insert!(user_token)
-    encoded_token
-  end
+ def create_user_api_token(user) do
+  {encoded_token, user_token} = UserToken.build_email_token(user, "api-token")
+  Repo.insert!(user_token)
+  encoded_token
+end
 
   @doc """
   Fetches the user by API token.

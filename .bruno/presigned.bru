@@ -1,0 +1,21 @@
+meta {
+  name: presigned
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:4000/api/presigned
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: dBwp52YyRf6JcnfTOWSHBT5u3h54Kp9qXicJzCl
+}
+
+body:json {
+  {
+    "key": "test123"
+  }
+}
