@@ -1,7 +1,7 @@
 defmodule ExboostWeb.ChatLive do
   use ExboostWeb, :live_view
+  alias Exboost.Accounts
   alias Exboost.Chats
-  alias Exboost.Chats.Chat
   alias Exboost.Chats.Message
 
   # Replace chats and messages with stream
@@ -117,22 +117,22 @@ defmodule ExboostWeb.ChatLive do
     |> assign(form: to_form(changeset))
   end
 
-  defp socket_show(socket, current_user) do
-    IO.inspect(socket)
-    chats = Chats.list_chats_by_user_visible(current_user.id)
-    chat = socket.assigns.chat
-    messages = Chats.list_messages_by_chat(chat.id)
-    message = messages |> List.last()
+  # defp socket_show(socket, current_user) do
+  #   IO.inspect(socket)
+  #   chats = Chats.list_chats_by_user_visible(current_user.id)
+  #   chat = socket.assigns.chat
+  #   messages = Chats.list_messages_by_chat(chat.id)
+  #   message = messages |> List.last()
 
-    # Setup sources
+  #   # Setup sources
 
-    socket
-    |> assign(chats: chats)
-    |> assign(messages: messages)
-    |> assign(sources: [])
-    |> assign(chat: chat)
-    |> assign(message: message)
-  end
+  #   socket
+  #   |> assign(chats: chats)
+  #   |> assign(messages: messages)
+  #   |> assign(sources: [])
+  #   |> assign(chat: chat)
+  #   |> assign(message: message)
+  # end
 
   defp assign_current_user(socket, session) do
     case session do

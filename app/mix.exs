@@ -8,8 +8,10 @@ defmodule Exboost.MixProject do
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
-      deps: deps()
+      dialyzer: dialyzer(),
+      docs: docs(),
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -23,8 +25,28 @@ defmodule Exboost.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
+  defp dialyzer do
+    [
+      plt_file: {:no_warn, "priv/plts/project.plt"}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"],
+      formatters: ["html"]
+    ]
+  end
+
   defp deps do
     [
+      {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
+      # {:poison, "~> 3.0"},
+      # {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6.6"}, # optional dependency
+      #
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.10"},
       {:phoenix_ecto, "~> 4.4"},
@@ -44,7 +66,13 @@ defmodule Exboost.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, ">= 0.0.0"}
+      {:bandit, ">= 0.0.0"},
+      #
+      {:flame_on, "~> 0.6.0"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end
 
@@ -56,7 +84,13 @@ defmodule Exboost.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
+      lint: [
+        "format --check-formatted --no-exit",
+        "credo --mute-exit-status",
+        "sobelow",
+        "dialyzer"
+      ]
     ]
   end
 end
