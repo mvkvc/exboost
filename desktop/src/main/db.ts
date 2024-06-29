@@ -1,16 +1,5 @@
-import fs from "fs";
-import os from "os";
 import { getFilesInFolder, hashFile } from "./files";
 import { Folder, File } from "./schema";
-
-export function getDBPath() {
-  const homeDir = os.homedir();
-  const appDir = `${homeDir}/.config/exboost`;
-  if (!fs.existsSync(appDir)) {
-    fs.mkdirSync(appDir);
-  }
-  return `${appDir}/exboost.db`;
-}
 
 export async function getFolders(): Promise<string[]> {
   try {
@@ -57,7 +46,6 @@ export async function deleteFolders(folderPaths: string[]): Promise<void> {
           path: folderPath,
         },
       });
-      console.log(`DELETED`, result);
     }
   } catch (error) {
     console.error(error);
@@ -69,7 +57,6 @@ export async function deleteAllFolders(): Promise<void> {
     const result = await Folder.destroy({
       where: {},
     });
-    console.log(`DELETED ALL`, result);
   } catch (error) {
     console.error(error);
   }

@@ -1,5 +1,5 @@
+import { ChildProcess } from "child_process";
 import path from "path";
-import { fork, ChildProcess } from "child_process";
 import { app, BrowserWindow, ipcMain } from "electron";
 import {
   getFolders,
@@ -7,19 +7,18 @@ import {
   deleteFolders,
   deleteAllFolders,
 } from "./main/db";
+import { getQueuePersistPath } from "./main/config";
 import { selectFolders } from "./main/files";
 import { umzug } from "./main/schema";
-import { requestPresignedURL } from "./main/api";
-
-export interface WatcherConfig {
-  folderPaths: string[];
-  ignorePatterns: string[];
-}
+import { WatcherConfig, startWatcher } from "./main/watcher";
+import { startQueue } from "./main/queue";
+import { Settings, loadSettings, saveSettings } from "./main/settings";
+import { logger } from "./main/logger";
 
 let mainWindow: BrowserWindow;
 let watcherProcess: ChildProcess | null = null;
-let URL: string;
-let APIKey: string;
+let queueProcess: ChildProcess | null = null;
+let settings: Settings | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -41,55 +40,44 @@ const createWindow = () => {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 };
 
-function startWatcher(config: WatcherConfig) {
-  watcherProcess?.kill();
-
-  const watcherPath = path.join(__dirname, "watcher.js");
-  watcherProcess = fork(watcherPath);
-  watcherProcess.send(config);
-
-  watcherProcess.on("message", (message) => {
-    handleWatcherMessage(message);
-  });
-}
-
-function handleWatcherMessage(message: any) {
-  console.log("Message from watcher: ", message);
-  const {type, data } = message;
-  switch (type) {
-    case "add":
-      break;
-    case "change":
-      break;
-    case "unlink":
-      break;
-  }
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 // app.on("ready", createWindow);
 app.on("ready", async () => {
+  settings = await loadSettings();
+  logger.info("Desktop started", settings);
+
+  ipcMain.handle("getSettings", (_event) => settings);
+  ipcMain.handle("setSettings", (_event, newSettings) => {
+    settings = newSettings;
+  });
   ipcMain.handle("selectFolders", selectFolders);
   ipcMain.handle("getFolders", getFolders);
   ipcMain.handle("addFolders", (_event, folderPaths) =>
-    addFolders(folderPaths),
+    addFolders(folderPaths)
   );
   ipcMain.handle("deleteFolders", (_event, folderPaths) =>
-    deleteFolders(folderPaths),
+    deleteFolders(folderPaths)
   );
   ipcMain.handle("deleteAllFolders", deleteAllFolders);
-  ipcMain.handle("startWatcher", (_event, config: WatcherConfig) =>
-    startWatcher(config),
-  );
+  ipcMain.handle("startQueue", (_event) => {
+    const config = { queueFilePath: getQueuePersistPath() };
+    queueProcess = startQueue(queueProcess, config);
+  });
+  
+  ipcMain.handle("startWatcher", (_event, config: WatcherConfig) => {
+    watcherProcess = startWatcher(watcherProcess, config, (message) => {
+      queueProcess?.send({ action: "push", data: message });
+    });
+  });
 
   await umzug.up();
 
@@ -100,7 +88,14 @@ app.on("ready", async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
+  saveSettings(settings);
+
   watcherProcess?.kill();
+  queueProcess?.kill();
+
+  if (settings) {
+    saveSettings(settings);
+  }
 
   if (process.platform !== "darwin") {
     app.quit();
@@ -115,5 +110,4 @@ app.on("activate", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+// In this file you can include the rest of your queueProcess: ChildProcess, config: QueueConfig, handleFn?: (data: any) => voidt them in separate files and import them here.

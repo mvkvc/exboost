@@ -6,7 +6,7 @@ import Error from "./routes/Error";
 import Sources from "./routes/Sources";
 import Settings from "./routes/Settings";
 import useFilesStore from "./stores/files";
-import { WatcherConfig } from "./main";
+import useSettingsStore from "./stores/settings";
 
 const router = createBrowserRouter([
   {
@@ -27,20 +27,21 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  const ignorePatterns = useFilesStore((state) => state.ignorePatterns);
   const setFolders = useFilesStore((state) => state.setFolders);
+  const setSettings = useSettingsStore((state) => state.setSettings);
 
   const handleInit = async () => {
+    const settings = await window.electronAPI.getSettings();
+    setSettings(settings);
+
+    await window.electronAPI.startQueue();
+
     const storedFolderPaths = await window.electronAPI.getFolders();
     if (storedFolderPaths.length >= 0) {
       setFolders(storedFolderPaths);
     }
 
-    const config: WatcherConfig = {
-      ignorePatterns: ignorePatterns,
-      folderPaths: storedFolderPaths,
-    };
-    await window.electronAPI.startWatcher(config);
+    await window.electronAPI.startWatcher({ folderPaths: storedFolderPaths });
   };
 
   useEffect(() => {

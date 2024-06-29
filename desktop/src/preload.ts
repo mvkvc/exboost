@@ -2,7 +2,8 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
-import { WatcherConfig } from "./main";
+import { Settings } from "./main/settings";
+import { WatcherConfig } from "./main/watcher";
 
 contextBridge.exposeInMainWorld("electronAPI", {
   selectFolders: () => ipcRenderer.invoke("selectFolders"),
@@ -15,4 +16,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   startWatcher(config: WatcherConfig) {
     ipcRenderer.invoke("startWatcher", config);
   },
+  startQueue: () => ipcRenderer.invoke("startQueue"),
+  getSettings: () => ipcRenderer.invoke("getSettings"),
+  setSettings: (settings: Settings) =>
+    ipcRenderer.invoke("setSettings", settings),
 });

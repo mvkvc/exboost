@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import useSettingsStore from "../stores/settings";
-import { Settings as TSettings, DEFAULT_SETTINGS } from "../utils/settings";
+import { DEFAULT_SETTINGS, Settings as TSettings } from "../main/settings";
 
 export default function Settings() {
   const getSettings = useSettingsStore((state) => state.getSettings);
@@ -12,45 +12,45 @@ export default function Settings() {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const settingsChanged = (oldSettings: TSettings, newSettings: TSettings) => {
-    return Object.entries(newSettings).every(
-      ([key, value]) => oldSettings[key as keyof TSettings] === value
+    return !Object.entries(newSettings).every(
+      ([key, value]) => oldSettings[key as keyof TSettings] === value,
     );
   };
 
-  const handleReset = (event: any) => {
+  const handleReset = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    const newSettings = {
+    await window.electronAPI.setSettings(DEFAULT_SETTINGS);
+
+    const updatedSettings = {
       ...savedSettings,
-      URL: DEFAULT_SETTINGS.URL,
-      APIKey: DEFAULT_SETTINGS.APIKey,
+      ...DEFAULT_SETTINGS,
     };
 
-    setSettings(newSettings);
-    setFormData(newSettings);
+    setSettings(updatedSettings);
+    setFormData(updatedSettings);
     setUnsavedChanges(false);
   };
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     setSettings({ ...formData });
-
     setSavedSettings({ ...formData });
     setUnsavedChanges(false);
   };
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     const newFormData = { ...formData, [name]: value };
 
     setFormData(newFormData);
-    setUnsavedChanges(!settingsChanged(formData, newFormData));
+    setUnsavedChanges(settingsChanged(savedSettings, newFormData));
   };
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 align-middle">
         <h1>Settings</h1>
         <div className="flex flex-row space-x-2 items-center">
           <button onClick={handleSubmit} className="btn">
@@ -65,11 +65,12 @@ export default function Settings() {
         </div>
         <form className="form-control w-full max-w-lg">
           <div className="flex items-center mb-4">
-            <label className="label flex-none w-1/4" htmlFor="workerAPIKey">
+            <label className="label flex-none w-1/4" htmlFor="APIKey">
               <span>API Key</span>
             </label>
             <input
               type="password"
+              id="APIKey"
               name="APIKey"
               value={formData.APIKey}
               onChange={handleChange}
@@ -77,11 +78,12 @@ export default function Settings() {
             />
           </div>
           <div className="flex items-center mb-4">
-            <label className="label flex-none w-1/4" htmlFor="urlServer">
+            <label className="label flex-none w-1/4" htmlFor="URL">
               <span>URL server</span>
             </label>
             <input
               type="text"
+              id="URL"
               name="URL"
               value={formData.URL}
               onChange={handleChange}

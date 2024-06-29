@@ -1,10 +1,11 @@
-import { DataTypes } from "sequelize";
-import type { Migration } from "../ipc/schema";
+import { DataTypes, QueryInterface } from "sequelize";
+import { MigrationParams, RunnableMigration } from "umzug";
+import type { Migration } from "../main/schema";
 
 const name: string = "01_createFilesTable";
 
-const up: Migration = ({ context: queryInterface }) => {
-  queryInterface.createTable("files", {
+const up: Migration = async (params: MigrationParams<QueryInterface>) => {
+  await params.context.createTable("files", {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -32,8 +33,14 @@ const up: Migration = ({ context: queryInterface }) => {
   });
 };
 
-const down: Migration = ({ context: queryInterface }) => {
-  queryInterface.dropTable("files");
+const down: Migration = async (params: MigrationParams<QueryInterface>) => {
+  await params.context.dropTable("files");
 };
 
-export default { name, up, down };
+const migration: RunnableMigration<QueryInterface> = {
+  name,
+  up,
+  down,
+};
+
+export default migration;

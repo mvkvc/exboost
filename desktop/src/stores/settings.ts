@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { subscribeWithSelector } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { Settings, DEFAULT_SETTINGS } from "../utils/settings";
+import { Settings, DEFAULT_SETTINGS } from "../main/settings";
 
 type State = Settings;
 
@@ -11,7 +11,7 @@ type Actions = {
 };
 
 const useSettingsStore = create<State & Actions>()(
-  persist(
+  subscribeWithSelector(
     immer((set, get) => ({
       ...DEFAULT_SETTINGS,
       getSettings: () => get(),
@@ -20,12 +20,19 @@ const useSettingsStore = create<State & Actions>()(
           Object.assign(state, settings);
         });
       },
-    })),
-    {
-      name: "settings",
-      storage: createJSONStorage(() => localStorage),
-    }
+    }))
   )
+);
+
+useSettingsStore.subscribe(
+  (state) => [state.URL, state.APIKey],
+  async ([URL, APIKey]) => {
+    const settings = {
+      URL,
+      APIKey,
+    };
+    await window.electronAPI.setSettings(settings);
+  }
 );
 
 export default useSettingsStore;

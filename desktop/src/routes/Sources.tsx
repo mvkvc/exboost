@@ -27,11 +27,15 @@ export default function Sources() {
 
   return (
     <>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-4">
         <h1>Sources</h1>
         <div className="flex flex-row space-x-4">
-          <button onClick={handleSelectFolders}>Add Folder</button>
-          <button onClick={handleDeleteAllFolders}>Delete All Folders</button>
+          <button className="btn" onClick={handleSelectFolders}>
+            Add Folder
+          </button>
+          <button className="btn" onClick={handleDeleteAllFolders}>
+            Delete All Folders
+          </button>
         </div>
         {folderPaths.map((folderPath) => (
           <div key={folderPath} className="flex flex-row space-x-4">

@@ -6,7 +6,7 @@ export async function selectFolders() {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: [
       "openDirectory",
-      // "multiSelections"
+      // "multiSelections" // Not working on Linux for some reason
     ],
   });
   if (!canceled) {
