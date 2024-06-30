@@ -13,11 +13,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   deleteFolders: (folderPaths: string[]) =>
     ipcRenderer.invoke("deleteFolders", folderPaths),
   deleteAllFolders: () => ipcRenderer.invoke("deleteAllFolders"),
+  getSettings: () => ipcRenderer.invoke("getSettings"),
+  setSettings: (settings: Settings) =>
+    ipcRenderer.invoke("setSettings", settings),
   startWatcher(config: WatcherConfig) {
     ipcRenderer.invoke("startWatcher", config);
   },
   startQueue: () => ipcRenderer.invoke("startQueue"),
-  getSettings: () => ipcRenderer.invoke("getSettings"),
-  setSettings: (settings: Settings) =>
-    ipcRenderer.invoke("setSettings", settings),
 });

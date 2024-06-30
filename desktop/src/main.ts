@@ -1,19 +1,19 @@
 import { ChildProcess } from "child_process";
 import path from "path";
 import { app, BrowserWindow, ipcMain } from "electron";
+import { getQueuePersistPath } from "./main/config";
 import {
   getFolders,
   addFolders,
   deleteFolders,
   deleteAllFolders,
 } from "./main/db";
-import { getQueuePersistPath } from "./main/config";
 import { selectFolders } from "./main/files";
-import { umzug } from "./main/schema";
-import { WatcherConfig, startWatcher } from "./main/watcher";
-import { startQueue } from "./main/queue";
-import { Settings, loadSettings, saveSettings } from "./main/settings";
 import { logger } from "./main/logger";
+import { startQueue } from "./main/queue";
+import { umzug } from "./main/schema";
+import { Settings, loadSettings, saveSettings } from "./main/settings";
+import { WatcherConfig, startWatcher } from "./main/watcher";
 
 let mainWindow: BrowserWindow;
 let watcherProcess: ChildProcess | null = null;
@@ -72,7 +72,7 @@ app.on("ready", async () => {
     const config = { queueFilePath: getQueuePersistPath() };
     queueProcess = startQueue(queueProcess, config);
   });
-  
+
   ipcMain.handle("startWatcher", (_event, config: WatcherConfig) => {
     watcherProcess = startWatcher(watcherProcess, config, (message) => {
       queueProcess?.send({ action: "push", data: message });

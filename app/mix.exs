@@ -41,6 +41,7 @@ defmodule Exboost.MixProject do
 
   defp deps do
     [
+      {:pgvector, "~> 0.3.0"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
       # {:poison, "~> 3.0"},

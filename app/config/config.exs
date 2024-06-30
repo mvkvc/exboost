@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :exboost, Exboost.Repo, types: Exboost.PostgrexTypes
+
 config :exboost,
   namespace: Exboost,
   ecto_repos: [Exboost.Repo],

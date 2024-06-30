@@ -1,7 +1,6 @@
 import { ChildProcess, fork } from "child_process";
 import fs from "fs/promises";
 import path from "path";
-// import { logger } from "./logger";
 
 export interface QueueConfig {
   queueFilePath: string;

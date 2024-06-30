@@ -28,6 +28,7 @@ defmodule ExboostWeb.Router do
     pipe_through :api
 
     post "/presigned", PresignedController, :create
+    post "/upload", UploadController, :create
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

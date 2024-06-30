@@ -40,7 +40,6 @@ export default function App() {
     if (storedFolderPaths.length >= 0) {
       setFolders(storedFolderPaths);
     }
-
     await window.electronAPI.startWatcher({ folderPaths: storedFolderPaths });
   };
 
