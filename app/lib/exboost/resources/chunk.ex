@@ -6,7 +6,8 @@ defmodule Exboost.Resources.Chunk do
   schema "chunks" do
     field :embed, Pgvector.Ecto.Vector
 
-    belongs_to(:resource, Resource)
+    belongs_to :user, User
+    belongs_to :resource, Resource
 
     timestamps(type: :utc_datetime)
   end

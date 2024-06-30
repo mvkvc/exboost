@@ -20,8 +20,8 @@ const useSettingsStore = create<State & Actions>()(
           Object.assign(state, settings);
         });
       },
-    }))
-  )
+    })),
+  ),
 );
 
 useSettingsStore.subscribe(
@@ -32,7 +32,7 @@ useSettingsStore.subscribe(
       APIKey,
     };
     await window.electronAPI.setSettings(settings);
-  }
+  },
 );
 
 export default useSettingsStore;

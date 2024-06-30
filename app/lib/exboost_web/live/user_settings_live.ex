@@ -14,10 +14,7 @@ defmodule ExboostWeb.UserSettingsLive do
       <div class="space-y-2">
         <h3>API Key</h3>
         <p><%= @api_key || "Shows when generated" %></p>
-        <button
-          phx-click="generate_api_key"
-          class="btn"
-        >Generate</button>
+        <button phx-click="generate_api_key" class="btn">Generate</button>
       </div>
       <div>
         <.simple_form

@@ -128,6 +128,7 @@ defmodule Exboost.Accounts.UserToken do
 
   def verify_api_token_query(token) do
     context = "api-token"
+
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
         hashed_token = :crypto.hash(@hash_algorithm, decoded_token)

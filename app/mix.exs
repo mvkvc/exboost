@@ -46,7 +46,8 @@ defmodule Exboost.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       # {:poison, "~> 3.0"},
       # {:hackney, "~> 1.9"},
-      {:sweet_xml, "~> 0.6.6"}, # optional dependency
+      # optional dependency
+      {:sweet_xml, "~> 0.6.6"},
       #
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.10"},

@@ -1,6 +1,8 @@
 import { logger } from "../main/logger";
 import { QueueConfig, Queue } from "../main/queue";
 import { WatcherMessage } from "../main/watcher";
+import { File } from "../main/schema";
+import { hashFile } from "../main/files";
 
 interface QueueStartMessage {
   action: "start";
@@ -23,8 +25,24 @@ let queue: Queue<WatcherMessage>;
 
 const PROCESS_BATCH_SIZE = 10;
 const PROCESS_INTERVAL_MS = 500;
-const handleFn = (message: WatcherMessage) => {
-  logger.info("queue handleFn", message);
+const handleFn = async (message: WatcherMessage) => {
+  const { type, path } = message;
+
+  if (type === "add" || type === "change") {
+    const fileHash = hashFile(path);
+    const file = await File.findOne({ where: { path } });
+
+    if (file.dataValues.hash !== fileHash) {
+      await File.update(
+        { hash: fileHash },
+        { where: { id: file.dataValues.id } },
+      );
+      // Upload file to server
+    }
+  } else if (type === "unlink") {
+    await File.destroy({ where: { path } });
+    // Report to server file deleted
+  }
 };
 
 process.on("message", (message: QueueMessage) => {
@@ -38,7 +56,7 @@ process.on("message", (message: QueueMessage) => {
         queueFilePath,
         PROCESS_BATCH_SIZE,
         PROCESS_INTERVAL_MS,
-        handleFn
+        handleFn,
       );
       break;
     case "stop":

@@ -3,8 +3,10 @@ defmodule Exboost.Resources.Resource do
   import Ecto.Changeset
 
   schema "resources" do
-    field :type, :string
     field :url, :string
+    field :type, :string
+
+    belongs_to :user, User
 
     timestamps(type: :utc_datetime)
   end

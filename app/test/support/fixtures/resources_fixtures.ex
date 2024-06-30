@@ -25,9 +25,7 @@ defmodule Exboost.ResourcesFixtures do
   def chunk_fixture(attrs \\ %{}) do
     {:ok, chunk} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> Exboost.Resources.create_chunk()
 
     chunk

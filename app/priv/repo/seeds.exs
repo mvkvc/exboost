@@ -18,6 +18,7 @@ user_attrs = %{
 }
 
 test_user = Accounts.get_user_by_email(user_attrs.email)
+
 if !test_user do
   {:ok, _user} = Accounts.register_user(user_attrs)
 end

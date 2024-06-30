@@ -17,7 +17,7 @@ export class Queue<T> {
     queueFilePath: string,
     processBatchSize: number,
     processIntervalMS: number,
-    handleFn: (data: T) => any
+    handleFn: (data: T) => any,
   ) {
     this.queueFilePath = queueFilePath;
     this.processBatchSize = processBatchSize;
@@ -74,7 +74,7 @@ export class Queue<T> {
 
 export const startQueue = (
   queueProcess: ChildProcess,
-  queueConfig: QueueConfig
+  queueConfig: QueueConfig,
 ): ChildProcess => {
   queueProcess?.kill();
 

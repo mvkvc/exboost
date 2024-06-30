@@ -40,7 +40,7 @@ const createWindow = () => {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
   // Open the DevTools.
@@ -62,10 +62,10 @@ app.on("ready", async () => {
   ipcMain.handle("selectFolders", selectFolders);
   ipcMain.handle("getFolders", getFolders);
   ipcMain.handle("addFolders", (_event, folderPaths) =>
-    addFolders(folderPaths)
+    addFolders(folderPaths),
   );
   ipcMain.handle("deleteFolders", (_event, folderPaths) =>
-    deleteFolders(folderPaths)
+    deleteFolders(folderPaths),
   );
   ipcMain.handle("deleteAllFolders", deleteAllFolders);
   ipcMain.handle("startQueue", (_event) => {

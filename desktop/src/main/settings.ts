@@ -17,7 +17,7 @@ export const saveSettings = async (settings: Settings) => {
 };
 
 export const loadSettings = async (
-  reset: boolean = false
+  reset: boolean = false,
 ): Promise<Settings> => {
   const settingsPath = getSettingsPath();
 

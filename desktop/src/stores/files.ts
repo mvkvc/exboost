@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -35,12 +34,12 @@ const useFilesStore = create<State & Actions>()(
       deleteFolders: (folderPaths: string[]) => {
         set((state) => {
           state.folderPaths = state.folderPaths.filter(
-            (f) => !folderPaths.includes(f)
+            (f) => !folderPaths.includes(f),
           );
         });
       },
-    }))
-  )
+    })),
+  ),
 );
 
 useFilesStore.subscribe(
@@ -50,7 +49,7 @@ useFilesStore.subscribe(
       folderPaths,
     };
     await window.electronAPI.startWatcher(config);
-  }
+  },
 );
 
 export default useFilesStore;
